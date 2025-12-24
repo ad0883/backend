@@ -20,7 +20,7 @@ if not BOT_TOKEN or not CHAT_ID:
 # RATE LIMIT CONFIG
 # ==============================
 LAST_SENT = 0
-COOLDOWN_SECONDS = 15   # send max 1 image every 15 sec
+COOLDOWN_SECONDS = 5   # send max 1 image every 5 sec
 
 # ==============================
 # HEALTH CHECK
